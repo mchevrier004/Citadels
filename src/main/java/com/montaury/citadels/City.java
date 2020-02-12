@@ -36,15 +36,15 @@ public class City {
             score += districts().get(a).cost();
         }
 
-        score = score + districtsScoreBonus(possession);
+        score += districtsScoreBonus(possession);
         if (winsAllColorBonus()) {
-            score += 5;
+            score += 3;
         }
         if (board.isFirst(this)) {
-            score += (2);
+            score += 4;
         }
         if (isComplete()) {
-            score += (2);
+            score += 2;
         }
         return score;
     }
@@ -53,13 +53,13 @@ public class City {
         int score = 0;
         for (District d : districts()) {
             if (d == District.DRAGON_GATE) {
-                score = score + 2;
+                score += 2;
             }
             if (d == District.UNIVERSITY) {
-                score = score + 2;
+                score += 2;
             }
             if (d == District.TREASURY) {
-                score += score + possession.gold;
+                score += possession.gold;
             }
             if (d == District.MAP_ROOM) {
                 score += possession.hand.size();
@@ -69,10 +69,11 @@ public class City {
     }
 
     private boolean winsAllColorBonus() {
-        int districtTypes[] = new int[DistrictType.values().length];
+        int[] districtTypes = new int[DistrictType.values().length];
         for (District d : districts()) {
             districtTypes[d.districtType().ordinal()]++;
         }
+
         if (districtTypes[DistrictType.MILITARY.ordinal()] > 0 && districtTypes[DistrictType.NOBLE.ordinal()] > 0 && districtTypes[DistrictType.RELIGIOUS.ordinal()] > 0 && districtTypes[DistrictType.SPECIAL.ordinal()] > 0 && districtTypes[DistrictType.TRADE.ordinal()] > 0)
             return true;
 
@@ -83,10 +84,7 @@ public class City {
                     zeros++;
                 }
             }
-            if (zeros == 1 && districtTypes[DistrictType.SPECIAL.ordinal()] > 1) {
-                return true;
-            }
-            else return false;
+            return (zeros == 1 && districtTypes[DistrictType.SPECIAL.ordinal()] > 1);
         } else return false;
     }
 

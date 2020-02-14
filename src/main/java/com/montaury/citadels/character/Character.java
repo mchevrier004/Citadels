@@ -19,12 +19,12 @@ public enum Character {
         this(number, name, powers, null);
     }
 
-    Character(int number, String name,List<String> powers, DistrictType associatedDistrictType)
+    Character(int number, String name,List<String> powers, DistrictType districtType)
     {
         this.number = number;
         this.name = name;
         this.powers = powers;
-        this.associatedDistrictType = Option.of(associatedDistrictType);
+        this.districtType = districtType;
     }
 
     public int number() {
@@ -37,12 +37,12 @@ public enum Character {
 
     public List<String> getPowers() { return powers;}
 
-    public Option<DistrictType> associatedDistrictType() {
-        return associatedDistrictType;
+    public DistrictType getDistrictType() {
+        return districtType;
     }
 
     private final int number;
     private final String name;
     private final List<String> powers;
-    private final Option<DistrictType> associatedDistrictType;
+    private final DistrictType districtType;
 }

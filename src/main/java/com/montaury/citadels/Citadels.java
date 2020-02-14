@@ -28,6 +28,8 @@ public class Citadels {
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
+        //Procédure de création du joueur
+
         printLine("Hello! Quel est votre nom ? ");
         String playerName = scanner.next();
         printLine("Quel est votre age ? ");
@@ -36,6 +38,7 @@ public class Citadels {
         Player p = new Player(playerName, playerAge, new City(board), new HumanController());
         p.human = true;
         List<Player> players = List.of(p);
+        //Procédure de création des joueurs(ordinateur)
         printLine("Saisir le nombre de joueurs total (entre 2 et 8): ");
         int nbP;
         do {
@@ -47,14 +50,19 @@ public class Citadels {
             players = players.append(player
             );
         }
+        //Initialisation du jeu
+
+        //création de la pioche et distribution
         CardPile pioche = new CardPile(Card.all().toList().shuffle());
         players.forEach(player -> {
             player.add(2);
             player.add(pioche.draw(2));
         });
+        //remise de la couronne et définition du tour du jeu
         Player crown = players.maxBy(Player::age).get();
 
         List<Group> roundAssociations;
+        //lancer la partie
         do {
             java.util.List<Player> list = players.asJavaMutable();
             Collections.rotate(list, -players.indexOf(crown));
@@ -64,6 +72,8 @@ public class Citadels {
 
             List<Character> availableCharacters1 = availableCharacters;
             List<Character> discardedCharacters = List.empty();
+            //on met une carte de coté et maj des cartes disponibles
+            //on utilise plusieurs fois une variable avec le même nom
             for (int i = 0; i < 1; i++) {
                 Character discardedCharacter = randomCharacterSelector.among(availableCharacters1);
                 discardedCharacters = discardedCharacters.append(discardedCharacter);
@@ -74,6 +84,7 @@ public class Citadels {
 
             List<Character> availableCharacters11 = availableCharacters.remove(Character.KING);
             List<Character> discardedCharacters1 = List.empty();
+            //retourner carte visible
             for (int i = 0; i < 7 - playersInOrder.size() - 1; i++) {
                 Character discardedCharacter = randomCharacterSelector.among(availableCharacters11);
                 discardedCharacters1 = discardedCharacters1.append(discardedCharacter);
@@ -82,6 +93,7 @@ public class Citadels {
             List<Character> faceUpDiscardedCharacters = discardedCharacters1;
             availableCharacters = availableCharacters.removeAll(faceUpDiscardedCharacters);
 
+            //choix des personnages et définition du tour
             List<Group> associations1 = List.empty();
             for (Player player : playersInOrder) {
                 printLine(player.name() + " doit choisir un personnage");

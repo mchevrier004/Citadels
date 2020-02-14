@@ -106,7 +106,7 @@ public class Citadels {
             GameRoundAssociations groups = new GameRoundAssociations(associations);
 
             // Messages à afficher pour les actions du joueur
-            
+
             String draw2CardsAndKeep1 = "Draw 2 cards and keep 1";
             String receive2Coins = "Receive 2 coins";
             String draw3Keep1 = "Draw 3 cards and keep 1";
@@ -117,184 +117,189 @@ public class Citadels {
             String destroyDistrict = "Destroy district";
             String draw3For2Coins = "Draw 3 cards for 2 coins";
             String discard2For2Coins = "Discard card for 2 coins";
+            String endRound = "End round";
+            String exchangeCards = "Exchange cards with other player";
+            String killPlayer = "Kill";
+            String receive1Gold = "Receive 1 gold";
+            String robPlayer = "Rob";
 
 
             for (int iii = 0; iii < 8; iii++) {
                 for (int ii = 0; ii < associations.size(); ii++) {
                     if (iii + 1 == associations.get(ii).character.number() && !associations.get(ii).isMurdered()) {
-                            Group group = associations.get(ii);
-                            associations.get(ii).thief().peek(thief -> thief.steal(group.player()));
-                            Set<String> baseActions = HashSet.of(draw2CardsAndKeep1, receive2Coins);
-                            List<District> districts = group.player().city().districts();
-                            Set<String> availableActions = baseActions;
-                            for (District d : districts) {
-                                if (d == District.OBSERVATORY) {
-                                    availableActions = availableActions.replace(draw2CardsAndKeep1, draw3Keep1);
+                        Group group = associations.get(ii);
+                        associations.get(ii).thief().peek(thief -> thief.steal(group.player()));
+                        Set<String> baseActions = HashSet.of(draw2CardsAndKeep1, receive2Coins);
+                        List<District> districts = group.player().city().districts();
+                        Set<String> availableActions = baseActions;
+                        for (District d : districts) {
+                            if (d == District.OBSERVATORY) {
+                                availableActions = availableActions.replace(draw2CardsAndKeep1, draw3Keep1);
+                            }
+                        }
+                        // keep only actions that player can realize
+                        List<String> possibleActions = List.empty();
+                        for (String action : availableActions) {
+                            if (action.equals(draw2CardsAndKeep1)) {
+                                if (pioche.canDraw(2)) {
+                                    possibleActions = possibleActions.append(draw2CardsAndKeep1);
                                 }
                             }
+                            else if (action.equals(draw3Keep1)) {
+                                if (pioche.canDraw(3))
+                                    possibleActions = possibleActions.append(draw2CardsAndKeep1);
+                            }
+                            else {
+                                possibleActions = possibleActions.append(action);
+                            }
+                        }
+                        String actionType = group.player().controller.selectActionAmong(possibleActions.toList());
+                        // execute selected action
+                        if (actionType.equals(draw2CardsAndKeep1)) {
+                            Set<Card> cardsDrawn = pioche.draw(2);
+                            if (!group.player().city().has(District.LIBRARY)) {
+                                Card keptCard = group.player().controller.selectAmong(cardsDrawn);
+                                pioche.discard(cardsDrawn.remove(keptCard).toList());
+                                cardsDrawn = HashSet.of(keptCard);
+                            }
+                            group.player().add(cardsDrawn);
+                        }
+                        else if (actionType.equals(receive2Coins)) {
+                            group.player().add(2);
+                        }
+                        else if (actionType.equals(draw3Keep1)) {
+                            Set<Card> cardsDrawn = pioche.draw(3);
+                            if (!group.player().city().has(District.LIBRARY)) {
+                                Card keptCard = group.player().controller.selectAmong(cardsDrawn);
+                                pioche.discard(cardsDrawn.remove(keptCard).toList());
+                                cardsDrawn = HashSet.of(keptCard);
+                            }
+                            group.player().add(cardsDrawn);
+                        }
+                        actionExecuted(group, actionType, associations);
+
+                        // receive powers from the character
+                        List<String> powers = null;
+                        powers = group.character.getPowers();
+                        List<String>  extraActions = List.empty();
+                        for (District d : group.player().city().districts()) {
+                            if (d == District.SMITHY) {
+                                extraActions = extraActions.append(draw3For2Coins);
+                            }
+                            if (d == District.LABORATORY) {
+                                extraActions = extraActions.append(discard2For2Coins);
+                            }
+                        }
+                        Set<String> availableActions11 = Group.OPTIONAL_ACTIONS
+                                .addAll(powers)
+                                .addAll(extraActions);
+                        String actionType11;
+                        do {
+                            Set<String> availableActions1 = availableActions11;
                             // keep only actions that player can realize
-                            List<String> possibleActions = List.empty();
-                            for (String action : availableActions) {
-                                if (action.equals(draw2CardsAndKeep1)) {
-                                    if (pioche.canDraw(2)) {
-                                        possibleActions = possibleActions.append(draw2CardsAndKeep1);
+                            List<String> possibleActions2 = List.empty();
+                            for (String action : availableActions1) {
+                                if (action.equals(buildDistrict)) {
+                                    if (!group.player().buildableDistrictsInHand().isEmpty())
+                                        possibleActions2 = possibleActions2.append(buildDistrict);
+                                }
+                                else if (action.equals(destroyDistrict)) {
+                                    if (DestroyDistrictAction.districtsDestructibleBy(groups, group.player()).exists(districtsByPlayer -> !districtsByPlayer._2().isEmpty())) {
+                                        possibleActions2 = possibleActions2.append(destroyDistrict);
                                     }
                                 }
-                                else if (action.equals(draw3Keep1)) {
-                                    if (pioche.canDraw(3))
-                                        possibleActions = possibleActions.append(draw2CardsAndKeep1);
+                                else if (action.equals(discard2For2Coins)) {
+                                    if (!group.player().cards().isEmpty()) {
+                                        possibleActions2 = possibleActions2.append(discard2For2Coins);
+                                    }
                                 }
-                                else {
-                                    possibleActions = possibleActions.append(action);
+                                else if (action.equals(draw3For2Coins)) {
+                                    if (pioche.canDraw(3) && group.player().canAfford(2)) {
+                                        possibleActions2 = possibleActions2.append(draw3For2Coins);
+                                    }
                                 }
+                                else if (action.equals(exchangeCardsWithPile)) {
+                                    if (!group.player().cards().isEmpty() && pioche.canDraw(1)) {
+                                        possibleActions2 = possibleActions2.append(exchangeCardsWithPile);
+                                    }
+                                }
+                                else if (action.equals(pick2Cards)) {
+                                    if (pioche.canDraw(2))
+                                        possibleActions2 = possibleActions2.append(pick2Cards);
+                                }
+                                else
+                                    possibleActions2 = possibleActions2.append(action);
                             }
-                            String actionType = group.player().controller.selectActionAmong(possibleActions.toList());
+                            String actionChoisie = group.player().controller.selectActionAmong(possibleActions2.toList());
                             // execute selected action
-                            if (actionType.equals(draw2CardsAndKeep1)) {
-                                Set<Card> cardsDrawn = pioche.draw(2);
-                                if (!group.player().city().has(District.LIBRARY)) {
-                                    Card keptCard = group.player().controller.selectAmong(cardsDrawn);
-                                    pioche.discard(cardsDrawn.remove(keptCard).toList());
-                                    cardsDrawn = HashSet.of(keptCard);
-                                }
-                                group.player().add(cardsDrawn);
+                            if (actionChoisie.equals(endRound))
+                            {printLine("Fin du round");}
+                            else if (actionChoisie.equals(buildDistrict)) {
+                                Card card = group.player().controller.selectAmong(group.player().buildableDistrictsInHand());
+                                group.player().buildDistrict(card);
                             }
-                            else if (actionType.equals(receive2Coins)) {
+                            else if (actionChoisie.equals(discard2For2Coins)) {
+                                Player player = group.player();
+                                Card card = player.controller.selectAmong(player.cards());
+                                player.cards = player.cards().remove(card);
+                                pioche.discard(card);
+                                player.add(2);
+                            }
+                            else if (actionChoisie.equals(draw3For2Coins)) {
+                                group.player().add(pioche.draw(3));
+                                group.player().pay(2);
+                            }
+                            else if (actionChoisie.equals(exchangeCardsWithPile)) {
+                                Set<Card> cardsToSwap = group.player().controller.selectManyAmong(group.player().cards());
+                                group.player().cards = group.player().cards().removeAll(cardsToSwap);
+                                group.player().add(pioche.swapWith(cardsToSwap.toList()));
+                            }
+                            else if (actionChoisie.equals(exchangeCards)) {
+                                Player playerToSwapWith = group.player().controller.selectPlayerAmong(groups.associations.map(Group::player).remove(group.player()));
+                                group.player().exchangeHandWith(playerToSwapWith);
+                            }
+                            else if (actionChoisie.equals(killPlayer)) {
+                                Character characterToMurder = group.player().controller.selectAmong(List.of(Character.THIEF, Character.MAGICIAN, Character.KING, Character.BISHOP, Character.MERCHANT, Character.ARCHITECT, Character.WARLORD));
+                                groups.associationToCharacter(characterToMurder).peek(Group::murder);
+                            }
+                            else if (actionChoisie.equals(pick2Cards)) {
+                                group.player().add(pioche.draw(2));
+                            }
+                            else if (actionChoisie.equals(receive2Coins)) {
                                 group.player().add(2);
                             }
-                            else if (actionType.equals(draw3Keep1)) {
-                                Set<Card> cardsDrawn = pioche.draw(3);
-                                if (!group.player().city().has(District.LIBRARY)) {
-                                    Card keptCard = group.player().controller.selectAmong(cardsDrawn);
-                                    pioche.discard(cardsDrawn.remove(keptCard).toList());
-                                    cardsDrawn = HashSet.of(keptCard);
-                                }
-                                group.player().add(cardsDrawn);
+                            else if (actionChoisie.equals(receive1Gold)) {
+                                group.player().add(1);
                             }
-                            actionExecuted(group, actionType, associations);
-
-                            // receive powers from the character
-                            List<String> powers = null;
-                            powers = group.character.getPowers();
-                            List<String>  extraActions = List.empty();
-                            for (District d : group.player().city().districts()) {
-                                if (d == District.SMITHY) {
-                                    extraActions = extraActions.append(draw3For2Coins);
-                                }
-                                if (d == District.LABORATORY) {
-                                    extraActions = extraActions.append(discard2For2Coins);
+                            else if (actionChoisie.equals(receiveIncome)) {
+                                DistrictType type = group.character.getDistrictType();
+                                if (type != null) {
+                                    for (District d : group.player().city().districts()) {
+                                        if (d.districtType() == type) {
+                                            group.player().add(1);
+                                        }
+                                        if (d == District.MAGIC_SCHOOL) {
+                                            group.player().add(1);
+                                        }
+                                    }
                                 }
                             }
-                            Set<String> availableActions11 = Group.OPTIONAL_ACTIONS
-                                    .addAll(powers)
-                                    .addAll(extraActions);
-                            String actionType11;
-                            do {
-                                Set<String> availableActions1 = availableActions11;
-                                // keep only actions that player can realize
-                                List<String> possibleActions2 = List.empty();
-                                for (String action : availableActions1) {
-                                    if (action.equals(buildDistrict)) {
-                                        if (!group.player().buildableDistrictsInHand().isEmpty())
-                                            possibleActions2 = possibleActions2.append(buildDistrict);
-                                    }
-                                    else if (action.equals(destroyDistrict)) {
-                                        if (DestroyDistrictAction.districtsDestructibleBy(groups, group.player()).exists(districtsByPlayer -> !districtsByPlayer._2().isEmpty())) {
-                                            possibleActions2 = possibleActions2.append(destroyDistrict);
-                                        }
-                                    }
-                                    else if (action.equals(discard2For2Coins)) {
-                                        if (!group.player().cards().isEmpty()) {
-                                            possibleActions2 = possibleActions2.append(discard2For2Coins);
-                                        }
-                                    }
-                                    else if (action.equals(draw3For2Coins)) {
-                                        if (pioche.canDraw(3) && group.player().canAfford(2)) {
-                                            possibleActions2 = possibleActions2.append(draw3For2Coins);
-                                        }
-                                    }
-                                    else if (action.equals(exchangeCardsWithPile)) {
-                                        if (!group.player().cards().isEmpty() && pioche.canDraw(1)) {
-                                            possibleActions2 = possibleActions2.append(exchangeCardsWithPile);
-                                        }
-                                    }
-                                    else if (action.equals(pick2Cards)) {
-                                        if (pioche.canDraw(2))
-                                            possibleActions2 = possibleActions2.append(pick2Cards);
-                                    }
-                                    else
-                                        possibleActions2 = possibleActions2.append(action);
-                                }
-                                String actionChoisie = group.player().controller.selectActionAmong(possibleActions2.toList());
-                                // execute selected action
-                                if (actionChoisie.equals("End round"))
-                                    {printLine("Fin du round");}
-                                else if (actionChoisie.equals(buildDistrict)) {
-                                    Card card = group.player().controller.selectAmong(group.player().buildableDistrictsInHand());
-                                    group.player().buildDistrict(card);
-                                    }
-                                else if (actionChoisie.equals(discard2For2Coins)) {
-                                    Player player = group.player();
-                                    Card card = player.controller.selectAmong(player.cards());
-                                    player.cards = player.cards().remove(card);
-                                    pioche.discard(card);
-                                    player.add(2);
-                                    }
-                                else if (actionChoisie.equals(draw3For2Coins)) {
-                                    group.player().add(pioche.draw(3));
-                                    group.player().pay(2);
-                                    }
-                                else if (actionChoisie.equals(exchangeCardsWithPile)) {
-                                    Set<Card> cardsToSwap = group.player().controller.selectManyAmong(group.player().cards());
-                                    group.player().cards = group.player().cards().removeAll(cardsToSwap);
-                                    group.player().add(pioche.swapWith(cardsToSwap.toList()));
-                                    }
-                                else if (actionChoisie.equals("Exchange cards with other player")) {
-                                    Player playerToSwapWith = group.player().controller.selectPlayerAmong(groups.associations.map(Group::player).remove(group.player()));
-                                    group.player().exchangeHandWith(playerToSwapWith);
-                                    }
-                                else if (actionChoisie.equals("Kill")) {
-                                    Character characterToMurder = group.player().controller.selectAmong(List.of(Character.THIEF, Character.MAGICIAN, Character.KING, Character.BISHOP, Character.MERCHANT, Character.ARCHITECT, Character.WARLORD));
-                                    groups.associationToCharacter(characterToMurder).peek(Group::murder);
-                                    }
-                                else if (actionChoisie.equals(pick2Cards)) {
-                                    group.player().add(pioche.draw(2));
-                                    }
-                                else if (actionChoisie.equals(receive2Coins)) {
-                                    group.player().add(2);
-                                    }
-                                else if (actionChoisie.equals("Receive 1 gold")) {
-                                    group.player().add(1);
-                                    }
-                                else if (actionChoisie.equals(receiveIncome)) {
-                                    DistrictType type = group.character.getDistrictType();
-                                    if (type != null) {
-                                        for (District d : group.player().city().districts()) {
-                                            if (d.districtType() == type) {
-                                                group.player().add(1);
-                                            }
-                                            if (d == District.MAGIC_SCHOOL) {
-                                                group.player().add(1);
-                                            }
-                                        }
-                                    }
-                                    }
-                                else if (actionChoisie.equals(destroyDistrict)) {
-                                    // flemme...
-                                }
-                                    else if (actionChoisie.equals("Rob")) {
-                                    Character character = group.player().controller.selectAmong(List.of(Character.MAGICIAN, Character.KING, Character.BISHOP, Character.MERCHANT, Character.ARCHITECT, Character.WARLORD)
-                                            .removeAll(groups.associations.find(Group::isMurdered).map(Group::character)));
-                                    groups.associationToCharacter(character).peek(association -> association.stolenBy(group.player()));
-                                }
-                                actionExecuted(group, actionChoisie, associations);
-                                actionType11 = actionChoisie;
-                                availableActions11 = availableActions11.remove(actionType11);
+                            else if (actionChoisie.equals(destroyDistrict)) {
+                                // flemme...
                             }
-                            while (!availableActions11.isEmpty() && !actionType11.equals("End round"));
+                            else if (actionChoisie.equals(robPlayer)) {
+                                Character character = group.player().controller.selectAmong(List.of(Character.MAGICIAN, Character.KING, Character.BISHOP, Character.MERCHANT, Character.ARCHITECT, Character.WARLORD)
+                                        .removeAll(groups.associations.find(Group::isMurdered).map(Group::character)));
+                                groups.associationToCharacter(character).peek(association -> association.stolenBy(group.player()));
+                            }
+                            actionExecuted(group, actionChoisie, associations);
+                            actionType11 = actionChoisie;
+                            availableActions11 = availableActions11.remove(actionType11);
                         }
+                        while (!availableActions11.isEmpty() && !actionType11.equals("End round"));
                     }
                 }
+            }
             roundAssociations = associations;
             crown = roundAssociations.find(a -> a.character == Character.KING).map(Group::player).getOrElse(crown);
         } while (!players.map(Player::city).exists(City::isComplete));

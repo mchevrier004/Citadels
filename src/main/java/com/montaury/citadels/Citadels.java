@@ -22,17 +22,21 @@ import java.util.Collections;
 import java.util.Scanner;
 
 public class Citadels {
+    public static void printLine(String whatToPrint){
+        System.out.println(whatToPrint);
+    }
+
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        System.out.println("Hello! Quel est votre nom ? ");
+        printLine("Hello! Quel est votre nom ? ");
         String playerName = scanner.next();
-        System.out.println("Quel est votre age ? ");
+        printLine("Quel est votre age ? ");
         int playerAge = scanner.nextInt();
         Board board = new Board();
         Player p = new Player(playerName, playerAge, new City(board), new HumanController());
         p.human = true;
         List<Player> players = List.of(p);
-        System.out.println("Saisir le nombre de joueurs total (entre 2 et 8): ");
+        printLine("Saisir le nombre de joueurs total (entre 2 et 8): ");
         int nbP;
         do {
             nbP = scanner.nextInt();
@@ -80,7 +84,7 @@ public class Citadels {
 
             List<Group> associations1 = List.empty();
             for (Player player : playersInOrder) {
-                System.out.println(player.name() + " doit choisir un personnage");
+                printLine(player.name() + " doit choisir un personnage");
                 availableCharacters = availableCharacters.size() == 1 && playersInOrder.size() == 7 ? availableCharacters.append(faceDownDiscardedCharacter) : availableCharacters;
                 Character selectedCharacter = player.controller.selectOwnCharacter(availableCharacters, faceUpDiscardedCharacters);
                 availableCharacters = availableCharacters.remove(selectedCharacter);
@@ -184,7 +188,7 @@ public class Citadels {
                                 powers = List.of(receiveIncome, destroyDistrict);
                             }
                             else {
-                                System.out.println("Uh oh");
+                                printLine("Uh oh");
                             }
                             List<String>  extraActions = List.empty();
                             for (District d : group.player().city().districts()) {
@@ -238,47 +242,48 @@ public class Citadels {
                                 String actionType1 = group.player().controller.selectActionAmong(possibleActions2.toList());
                                 // execute selected action
                                 if (actionType1.equals("End round"))
-                                    {} else if (actionType1.equals(buildDistrict)) {
+                                    {printLine("Fin du round");}
+                                else if (actionType1.equals(buildDistrict)) {
                                     Card card = group.player().controller.selectAmong(group.player().buildableDistrictsInHand());
                                     group.player().buildDistrict(card);
                                     }
-                                    else if (actionType1.equals(discard2For2Coins)) {
+                                else if (actionType1.equals(discard2For2Coins)) {
                                     Player player = group.player();
                                     Card card = player.controller.selectAmong(player.cards());
                                     player.cards = player.cards().remove(card);
                                     pioche.discard(card);
                                     player.add(2);
                                     }
-                                    else if (actionType1.equals(draw3For2Coins)) {
+                                else if (actionType1.equals(draw3For2Coins)) {
                                     group.player().add(pioche.draw(3));
                                     group.player().pay(2);
                                     }
-                                    else if (actionType1.equals(exchangeCardsWithPile)) {
+                                else if (actionType1.equals(exchangeCardsWithPile)) {
                                     Set<Card> cardsToSwap = group.player().controller.selectManyAmong(group.player().cards());
                                     group.player().cards = group.player().cards().removeAll(cardsToSwap);
                                     group.player().add(pioche.swapWith(cardsToSwap.toList()));
                                     }
-                                    else if (actionType1.equals("Exchange cards with other player")) {
+                                else if (actionType1.equals("Exchange cards with other player")) {
                                     Player playerToSwapWith = group.player().controller.selectPlayerAmong(groups.associations.map(Group::player).remove(group.player()));
                                     group.player().exchangeHandWith(playerToSwapWith);
                                     }
-                                    else if (actionType1.equals("Kill")) {
+                                else if (actionType1.equals("Kill")) {
                                     Character characterToMurder = group.player().controller.selectAmong(List.of(Character.THIEF, Character.MAGICIAN, Character.KING, Character.BISHOP, Character.MERCHANT, Character.ARCHITECT, Character.WARLORD));
                                     groups.associationToCharacter(characterToMurder).peek(Group::murder);
                                     }
-                                    else if (actionType1.equals(pick2Cards)) {
+                                else if (actionType1.equals(pick2Cards)) {
                                     group.player().add(pioche.draw(2));
                                     }
-                                    else if (actionType1.equals(receive2Coins)) {
+                                else if (actionType1.equals(receive2Coins)) {
                                     group.player().add(2);
                                     }
-                                    else if (actionType1.equals("Receive 1 gold")) {
+                                else if (actionType1.equals("Receive 1 gold")) {
                                     group.player().add(1);
                                     }
-                                    else if (actionType1.equals(receiveIncome)) {
+                                else if (actionType1.equals(receiveIncome)) {
                                     DistrictType type = null;
                                     if (group.character == Character.BISHOP) {
-                                            type = DistrictType.RELIGIOUS;
+                                        type = DistrictType.RELIGIOUS;
                                         }
                                     else if (group.character == Character.WARLORD) {
                                         type = DistrictType.MILITARY;
@@ -323,26 +328,26 @@ public class Citadels {
         // classe les joueurs par leur score
         // si ex-aequo, le premier est celui qui n'est pas assassiné
         // si pas d'assassiné, le gagnant est le joueur ayant eu le personnage avec le numéro d'ordre le plus petit au dernier tour
-        System.out.println("Classement: " + roundAssociations.sortBy(a -> Tuple.of(a.player().score(), !a.isMurdered(), a.character))
+        printLine("Classement: " + roundAssociations.sortBy(a -> Tuple.of(a.player().score(), !a.isMurdered(), a.character))
                 .reverse()
                 .map(Group::player));
     }
 
     public static void actionExecuted(Group association, String actionType, List<Group> associations) {
-        System.out.println("Player " + association.player().name() + " executed action " + actionType);
+        printLine("Player " + association.player().name() + " executed action " + actionType);
         associations.map(Group::player)
                 .forEach(Citadels::displayStatus);
     }
 
     private static void displayStatus(Player player) {
-        System.out.println("  Player " + player.name() + ":");
-        System.out.println("    Gold coins: " + player.gold());
-        System.out.println("    City: " + textCity(player));
-        System.out.println("    Hand size: " + player.cards().size());
+        printLine("  Player " + player.name() + ":");
+        printLine("    Gold coins: " + player.gold());
+        printLine("    City: " + textCity(player));
+        printLine("    Hand size: " + player.cards().size());
         if (player.controller instanceof HumanController) {
-            System.out.println("    Hand: " + textHand(player));
+            printLine("    Hand: " + textHand(player));
         }
-        System.out.println();
+        printLine("");
     }
 
     private static String textCity(Player player) {

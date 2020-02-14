@@ -175,33 +175,7 @@ public class Citadels {
 
                             // receive powers from the character
                             List<String> powers = null;
-                            if (group.character == Character.ASSASSIN) {
-                                powers = List.of("Kill");
-                            }
-                            else if (group.character == Character.THIEF) {
-                                powers = List.of("Rob");
-                            }
-                            else if (group.character == Character.MAGICIAN) {
-                                powers = List.of("Exchange cards with other player", exchangeCardsWithPile);
-                            }
-                            else if (group.character == Character.KING) {
-                                powers = List.of(receiveIncome);
-                            }
-                            else if (group.character == Character.BISHOP) {
-                                powers = List.of(receiveIncome);
-                            }
-                            else if (group.character == Character.MERCHANT) {
-                                powers = List.of(receiveIncome, "Receive 1 gold");
-                            }
-                            else if (group.character == Character.ARCHITECT) {
-                                powers = List.of(pick2Cards, buildDistrict, buildDistrict);
-                            }
-                            else if (group.character == Character.WARLORD) {
-                                powers = List.of(receiveIncome, destroyDistrict);
-                            }
-                            else {
-                                printLine("Uh oh");
-                            }
+                            powers = group.character.getPowers();
                             List<String>  extraActions = List.empty();
                             for (District d : group.player().city().districts()) {
                                 if (d == District.SMITHY) {

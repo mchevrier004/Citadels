@@ -241,7 +241,10 @@ public class Citadels {
                                     }
                                 }
                             } else if (actionChoisie.equals(destroyDistrict)) {
-                                // flemme...
+
+                                // Etape 1 : Récupérer les joueurs et choisir un joueur (Exceptions : BISHOP)
+                                // Etape 2 : Choisir un quartier à détruire (Exceptions : Grande muraille)
+                                // Etape 3 : Détruire le quartier
                             } else if (actionChoisie.equals(robPlayer)) {
                                 Character character = group.player().controller.selectAmong(List.of(Character.MAGICIAN, Character.KING, Character.BISHOP, Character.MERCHANT, Character.ARCHITECT, Character.WARLORD)
                                         .removeAll(groups.associations.find(Group::isMurdered).map(Group::character)));

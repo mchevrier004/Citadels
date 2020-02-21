@@ -9,13 +9,7 @@ import java.util.function.ToIntFunction;
 
 public class Effect {
 
-    public static Effect none() {
-        return new Effect(false);
-    }
-
-    public static Effect indestructible() {
-        return new Effect(true);
-    }
+    private final boolean indestructible;
 
     private Effect(boolean indestructible) {
         this.indestructible = indestructible;
@@ -25,13 +19,14 @@ public class Effect {
         return indestructible;
     }
 
+    public static Effect none() {
+        return new Effect(false);
+    }
+    public static Effect indestructible() {
+        return new Effect(true);
+    }
 
 
 
 
-
-
-
-
-    private final boolean indestructible;
 }

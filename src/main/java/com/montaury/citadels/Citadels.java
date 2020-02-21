@@ -132,21 +132,16 @@ public class Citadels {
                         Set<String> baseActions = HashSet.of(draw2CardsAndKeep1, receive2Coins);
                         List<District> districts = group.player().city().districts();
                         Set<String> availableActions = baseActions;
-                        for (District d : districts) {
-                            if (d == District.OBSERVATORY) {
-                                availableActions = availableActions.replace(draw2CardsAndKeep1, draw3Keep1);
-                            }
+                        if (districts.contains(District.OBSERVATORY)){
+                            availableActions = availableActions.replace(draw2CardsAndKeep1, draw3Keep1);
                         }
                         // keep only actions that player can realize
                         List<String> possibleActions = List.empty();
                         for (String action : availableActions) {
-                            if (action.equals(draw2CardsAndKeep1)) {
-                                if (pioche.canDraw(2)) {
-                                    possibleActions = possibleActions.append(draw2CardsAndKeep1);
-                                }
-                            } else if (action.equals(draw3Keep1)) {
-                                if (pioche.canDraw(3))
-                                    possibleActions = possibleActions.append(draw2CardsAndKeep1);
+                            if (action.equals(draw2CardsAndKeep1) && pioche.canDraw(2)) {
+                                possibleActions = possibleActions.append(draw2CardsAndKeep1);
+                            } else if (action.equals(draw3Keep1) && pioche.canDraw(3)) {
+                                possibleActions = possibleActions.append(draw2CardsAndKeep1);
                             } else {
                                 possibleActions = possibleActions.append(action);
                             }
@@ -175,8 +170,7 @@ public class Citadels {
                         actionExecuted(group, actionType, associations);
 
                         // receive powers from the character
-                        List<String> powers = null;
-                        powers = group.character.getPowers();
+                        List<String> powers = group.character.getPowers();
                         List<String> extraActions = List.empty();
                         for (District d : group.player().city().districts()) {
                             if (d == District.SMITHY) {

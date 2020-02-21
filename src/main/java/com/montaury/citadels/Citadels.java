@@ -132,7 +132,7 @@ public class Citadels {
                         Set<String> baseActions = HashSet.of(draw2CardsAndKeep1, receive2Coins);
                         List<District> districts = group.player().city().districts();
                         Set<String> availableActions = baseActions;
-                        if (districts.contains(District.OBSERVATORY)){
+                        if (districts.contains(District.OBSERVATORY)) {
                             availableActions = availableActions.replace(draw2CardsAndKeep1, draw3Keep1);
                         }
                         // keep only actions that player can realize
@@ -172,13 +172,11 @@ public class Citadels {
                         // receive powers from the character
                         List<String> powers = group.character.getPowers();
                         List<String> extraActions = List.empty();
-                        for (District d : group.player().city().districts()) {
-                            if (d == District.SMITHY) {
-                                extraActions = extraActions.append(draw3For2Coins);
-                            }
-                            if (d == District.LABORATORY) {
-                                extraActions = extraActions.append(discard2For2Coins);
-                            }
+                        if (group.player().city().districts().contains(District.SMITHY)) {
+                            extraActions = extraActions.append(draw3For2Coins);
+                        }
+                        if (group.player().city().districts().contains(District.LABORATORY)) {
+                            extraActions = extraActions.append(discard2For2Coins);
                         }
                         Set<String> availableActions11 = Group.OPTIONAL_ACTIONS
                                 .addAll(powers)
@@ -189,27 +187,17 @@ public class Citadels {
                             // keep only actions that player can realize
                             List<String> possibleActions2 = List.empty();
                             for (String action : availableActions1) {
-                                if (action.equals(buildDistrict)) {
-                                    if (!group.player().buildableDistrictsInHand().isEmpty())
+                                if (action.equals(buildDistrict) && !group.player().buildableDistrictsInHand().isEmpty()) {
                                         possibleActions2 = possibleActions2.append(buildDistrict);
-                                } else if (action.equals(destroyDistrict)) {
-                                    if (DestroyDistrictAction.districtsDestructibleBy(groups, group.player()).exists(districtsByPlayer -> !districtsByPlayer._2().isEmpty())) {
+                                } else if (action.equals(destroyDistrict) && DestroyDistrictAction.districtsDestructibleBy(groups, group.player()).exists(districtsByPlayer -> !districtsByPlayer._2().isEmpty())) {
                                         possibleActions2 = possibleActions2.append(destroyDistrict);
-                                    }
-                                } else if (action.equals(discard2For2Coins)) {
-                                    if (!group.player().cards().isEmpty()) {
+                                } else if (action.equals(discard2For2Coins) && !group.player().cards().isEmpty()) {
                                         possibleActions2 = possibleActions2.append(discard2For2Coins);
-                                    }
-                                } else if (action.equals(draw3For2Coins)) {
-                                    if (pioche.canDraw(3) && group.player().canAfford(2)) {
+                                } else if (action.equals(draw3For2Coins) && pioche.canDraw(3) && group.player().canAfford(2)) {
                                         possibleActions2 = possibleActions2.append(draw3For2Coins);
-                                    }
-                                } else if (action.equals(exchangeCardsWithPile)) {
-                                    if (!group.player().cards().isEmpty() && pioche.canDraw(1)) {
+                                } else if (action.equals(exchangeCardsWithPile) && !group.player().cards().isEmpty() && pioche.canDraw(1)) {
                                         possibleActions2 = possibleActions2.append(exchangeCardsWithPile);
-                                    }
-                                } else if (action.equals(pick2Cards)) {
-                                    if (pioche.canDraw(2))
+                                } else if (action.equals(pick2Cards) && pioche.canDraw(2)) {
                                         possibleActions2 = possibleActions2.append(pick2Cards);
                                 } else
                                     possibleActions2 = possibleActions2.append(action);
@@ -253,9 +241,9 @@ public class Citadels {
                                         if (d.districtType() == type) {
                                             group.player().add(1);
                                         }
-                                        if (d == District.MAGIC_SCHOOL) {
-                                            group.player().add(1);
-                                        }
+                                    }
+                                    if (group.player().city().districts().contains(District.MAGIC_SCHOOL)){
+                                        group.player().add(1);
                                     }
                                 }
                             } else if (actionChoisie.equals(destroyDistrict)) {
@@ -293,9 +281,9 @@ public class Citadels {
 
     private static void displayStatus(Player player) {
         printLine("  Player " + player.name() + ":\n" +
-                  "    Gold coins: " + player.gold() + "\n" +
-                  "    City: " + textCity(player) + "\n" +
-                  "    Hand size: " + player.cards().size());
+                "    Gold coins: " + player.gold() + "\n" +
+                "    City: " + textCity(player) + "\n" +
+                "    Hand size: " + player.cards().size());
         if (player.controller instanceof HumanController) {
             printLine("    Hand: " + textHand(player));
         }

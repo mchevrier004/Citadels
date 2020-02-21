@@ -21,6 +21,7 @@ import io.vavr.collection.Set;
 import java.util.Collections;
 import java.util.Scanner;
 
+
 public class Citadels {
     public static void printLine(String whatToPrint) {
         System.out.println(whatToPrint);
@@ -76,7 +77,6 @@ public class Citadels {
             //on utilise plusieurs fois une variable avec le même nom
             Character aDiscardedCharacter = randomCharacterSelector.among(availableCharacters1);
             discardedCharacters = discardedCharacters.append(aDiscardedCharacter);
-            availableCharacters1 = availableCharacters1.remove(aDiscardedCharacter);
             Character faceDownDiscardedCharacter = discardedCharacters.head();
             availableCharacters = availableCharacters.remove(faceDownDiscardedCharacter);
 
@@ -139,7 +139,7 @@ public class Citadels {
                             if (action.equals(draw2CardsAndKeep1) && pioche.canDraw(2)) {
                                 possibleActions = possibleActions.append(draw2CardsAndKeep1);
                             } else if (action.equals(draw3Keep1) && pioche.canDraw(3)) {
-                                possibleActions = possibleActions.append(draw2CardsAndKeep1);
+                                possibleActions = possibleActions.append(draw3Keep1);
                             } else {
                                 possibleActions = possibleActions.append(action);
                             }
@@ -235,11 +235,7 @@ public class Citadels {
                             } else if (actionChoisie.equals(receiveIncome)) {
                                 DistrictType type = group.character.getDistrictType();
                                 if (type != null) {
-                                    for (District d : group.player().city().districts()) {
-                                        if (d.districtType() == type) {
-                                            group.player().add(1);
-                                        }
-                                    }
+                                    group.player().add(group.player().city().districts().count(district->district.districtType() == type));
                                     if (group.player().city().districts().contains(District.MAGIC_SCHOOL)) {
                                         group.player().add(1);
                                     }

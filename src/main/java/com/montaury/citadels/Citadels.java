@@ -74,11 +74,9 @@ public class Citadels {
             List<Character> discardedCharacters = List.empty();
             //on met une carte de coté et maj des cartes disponibles
             //on utilise plusieurs fois une variable avec le même nom
-            for (int i = 0; i < 1; i++) {
-                Character discardedCharacter = randomCharacterSelector.among(availableCharacters1);
-                discardedCharacters = discardedCharacters.append(discardedCharacter);
-                availableCharacters1 = availableCharacters1.remove(discardedCharacter);
-            }
+            Character aDiscardedCharacter = randomCharacterSelector.among(availableCharacters1);
+            discardedCharacters = discardedCharacters.append(aDiscardedCharacter);
+            availableCharacters1 = availableCharacters1.remove(aDiscardedCharacter);
             Character faceDownDiscardedCharacter = discardedCharacters.head();
             availableCharacters = availableCharacters.remove(faceDownDiscardedCharacter);
 
@@ -188,17 +186,17 @@ public class Citadels {
                             List<String> possibleActions2 = List.empty();
                             for (String action : availableActions1) {
                                 if (action.equals(buildDistrict) && !group.player().buildableDistrictsInHand().isEmpty()) {
-                                        possibleActions2 = possibleActions2.append(buildDistrict);
+                                    possibleActions2 = possibleActions2.append(buildDistrict);
                                 } else if (action.equals(destroyDistrict) && DestroyDistrictAction.districtsDestructibleBy(groups, group.player()).exists(districtsByPlayer -> !districtsByPlayer._2().isEmpty())) {
-                                        possibleActions2 = possibleActions2.append(destroyDistrict);
+                                    possibleActions2 = possibleActions2.append(destroyDistrict);
                                 } else if (action.equals(discard2For2Coins) && !group.player().cards().isEmpty()) {
-                                        possibleActions2 = possibleActions2.append(discard2For2Coins);
+                                    possibleActions2 = possibleActions2.append(discard2For2Coins);
                                 } else if (action.equals(draw3For2Coins) && pioche.canDraw(3) && group.player().canAfford(2)) {
-                                        possibleActions2 = possibleActions2.append(draw3For2Coins);
+                                    possibleActions2 = possibleActions2.append(draw3For2Coins);
                                 } else if (action.equals(exchangeCardsWithPile) && !group.player().cards().isEmpty() && pioche.canDraw(1)) {
-                                        possibleActions2 = possibleActions2.append(exchangeCardsWithPile);
+                                    possibleActions2 = possibleActions2.append(exchangeCardsWithPile);
                                 } else if (action.equals(pick2Cards) && pioche.canDraw(2)) {
-                                        possibleActions2 = possibleActions2.append(pick2Cards);
+                                    possibleActions2 = possibleActions2.append(pick2Cards);
                                 } else
                                     possibleActions2 = possibleActions2.append(action);
                             }
@@ -242,7 +240,7 @@ public class Citadels {
                                             group.player().add(1);
                                         }
                                     }
-                                    if (group.player().city().districts().contains(District.MAGIC_SCHOOL)){
+                                    if (group.player().city().districts().contains(District.MAGIC_SCHOOL)) {
                                         group.player().add(1);
                                     }
                                 }

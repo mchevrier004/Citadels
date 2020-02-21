@@ -38,7 +38,7 @@ public class City {
 
         score += districtsScoreBonus(possession);
         if (winsAllColorBonus()) {
-            score += 3;
+            score += 5;//Le allColorBonus est égal à 5 et pas à 3 (correction le 14/02/2020)
         }
         if (board.isFirst(this)) {
             score += 4;

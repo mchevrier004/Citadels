@@ -3,19 +3,18 @@ package com.montaury.citadels;
 import com.montaury.citadels.character.Character;
 import com.montaury.citadels.character.RandomCharacterSelector;
 import com.montaury.citadels.district.Card;
-import com.montaury.citadels.district.DestructibleDistrict;
 import com.montaury.citadels.district.District;
 import com.montaury.citadels.district.DistrictType;
 import com.montaury.citadels.player.ComputerController;
 import com.montaury.citadels.player.HumanController;
 import com.montaury.citadels.player.Player;
+import com.montaury.citadels.round.ActionType;
 import com.montaury.citadels.round.GameRoundAssociations;
 import com.montaury.citadels.round.Group;
 import com.montaury.citadels.round.action.DestroyDistrictAction;
 import io.vavr.Tuple;
 import io.vavr.collection.HashSet;
 import io.vavr.collection.List;
-import io.vavr.collection.Map;
 import io.vavr.collection.Set;
 
 import java.util.Collections;
@@ -48,8 +47,7 @@ public class Citadels {
         for (int joueurs = 0; joueurs < nbP; joueurs += 1) {
             Player player = new Player("Computer " + joueurs, 35, new City(board), new ComputerController());
             player.computer = true;
-            players = players.append(player
-            );
+            players = players.append(player);
         }
         //Initialisation du jeu
 
@@ -202,6 +200,9 @@ public class Citadels {
                             }
                             String actionChoisie = group.player().controller.selectActionAmong(possibleActions2.toList());
                             // execute selected action
+<<<<<<< HEAD
+                            ActionType.execute(group, pioche, groups);
+=======
                             if (actionChoisie.equals(endRound)) {
                                 printLine("Fin du round");
                             } else if (actionChoisie.equals(buildDistrict)) {
@@ -250,6 +251,7 @@ public class Citadels {
                                         .removeAll(groups.associations.find(Group::isMurdered).map(Group::character)));
                                 groups.associationToCharacter(character).peek(association -> association.stolenBy(group.player()));
                             }
+>>>>>>> f879c654970ea2527c9daf7db946ac251b056c39
                             actionExecuted(group, actionChoisie, associations);
                             actionType11 = actionChoisie;
                             availableActions11 = availableActions11.remove(actionType11);

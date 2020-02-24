@@ -3,6 +3,7 @@ package com.montaury.citadels.player;
 import com.montaury.citadels.character.Character;
 import com.montaury.citadels.district.Card;
 import com.montaury.citadels.district.DestructibleDistrict;
+import com.montaury.citadels.round.ActionType;
 import io.vavr.collection.HashSet;
 import io.vavr.collection.List;
 import io.vavr.collection.Map;
@@ -22,7 +23,7 @@ public class ComputerController implements PlayerController {
     }
 
     @Override
-    public String selectActionAmong(List<String> actions) {
+    public ActionType selectActionAmong(List<ActionType> actions) {
         return randomAmong(actions);
     }
 

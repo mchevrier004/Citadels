@@ -4,7 +4,6 @@ import com.montaury.citadels.character.Character;
 import com.montaury.citadels.character.RandomCharacterSelector;
 import com.montaury.citadels.district.Card;
 import com.montaury.citadels.district.District;
-import com.montaury.citadels.district.DistrictType;
 import com.montaury.citadels.player.ComputerController;
 import com.montaury.citadels.player.HumanController;
 import com.montaury.citadels.player.Player;
@@ -107,17 +106,11 @@ public class Citadels {
             String receive2Coins = "Receive 2 coins";
             String draw3Keep1 = "Draw 3 cards and keep 1";
             String exchangeCardsWithPile = "Exchange cards with pile";
-            String receiveIncome = "Receive income";
             String pick2Cards = "Pick 2 cards";
             String buildDistrict = "Build district";
             String destroyDistrict = "Destroy district";
             String draw3For2Coins = "Draw 3 cards for 2 coins";
             String discard2For2Coins = "Discard card for 2 coins";
-            String endRound = "End round";
-            String exchangeCards = "Exchange cards with other player";
-            String killPlayer = "Kill";
-            String receive1Gold = "Receive 1 gold";
-            String robPlayer = "Rob";
 
 
             for (int iii = 0; iii < 8; iii++) {
@@ -200,58 +193,8 @@ public class Citadels {
                             }
                             String actionChoisie = group.player().controller.selectActionAmong(possibleActions2.toList());
                             // execute selected action
-<<<<<<< HEAD
-                            ActionType.execute(group, pioche, groups);
-=======
-                            if (actionChoisie.equals(endRound)) {
-                                printLine("Fin du round");
-                            } else if (actionChoisie.equals(buildDistrict)) {
-                                Card card = group.player().controller.selectAmong(group.player().buildableDistrictsInHand());
-                                group.player().buildDistrict(card);
-                            } else if (actionChoisie.equals(discard2For2Coins)) {
-                                Player player = group.player();
-                                Card card = player.controller.selectAmong(player.cards());
-                                player.cards = player.cards().remove(card);
-                                pioche.discard(card);
-                                player.add(2);
-                            } else if (actionChoisie.equals(draw3For2Coins)) {
-                                group.player().add(pioche.draw(3));
-                                group.player().pay(2);
-                            } else if (actionChoisie.equals(exchangeCardsWithPile)) {
-                                Set<Card> cardsToSwap = group.player().controller.selectManyAmong(group.player().cards());
-                                group.player().cards = group.player().cards().removeAll(cardsToSwap);
-                                group.player().add(pioche.swapWith(cardsToSwap.toList()));
-                            } else if (actionChoisie.equals(exchangeCards)) {
-                                Player playerToSwapWith = group.player().controller.selectPlayerAmong(groups.associations.map(Group::player).remove(group.player()));
-                                group.player().exchangeHandWith(playerToSwapWith);
-                            } else if (actionChoisie.equals(killPlayer)) {
-                                Character characterToMurder = group.player().controller.selectAmong(List.of(Character.THIEF, Character.MAGICIAN, Character.KING, Character.BISHOP, Character.MERCHANT, Character.ARCHITECT, Character.WARLORD));
-                                groups.associationToCharacter(characterToMurder).peek(Group::murder);
-                            } else if (actionChoisie.equals(pick2Cards)) {
-                                group.player().add(pioche.draw(2));
-                            } else if (actionChoisie.equals(receive2Coins)) {
-                                group.player().add(2);
-                            } else if (actionChoisie.equals(receive1Gold)) {
-                                group.player().add(1);
-                            } else if (actionChoisie.equals(receiveIncome)) {
-                                DistrictType type = group.character.getDistrictType();
-                                if (type != null) {
-                                    group.player().add(group.player().city().districts().count(district->district.districtType() == type));
-                                    if (group.player().city().districts().contains(District.MAGIC_SCHOOL)) {
-                                        group.player().add(1);
-                                    }
-                                }
-                            } else if (actionChoisie.equals(destroyDistrict)) {
-
-                                // Etape 1 : Récupérer les joueurs et choisir un joueur (Exceptions : BISHOP)
-                                // Etape 2 : Choisir un quartier à détruire (Exceptions : Grande muraille)
-                                // Etape 3 : Détruire le quartier
-                            } else if (actionChoisie.equals(robPlayer)) {
-                                Character character = group.player().controller.selectAmong(List.of(Character.MAGICIAN, Character.KING, Character.BISHOP, Character.MERCHANT, Character.ARCHITECT, Character.WARLORD)
-                                        .removeAll(groups.associations.find(Group::isMurdered).map(Group::character)));
-                                groups.associationToCharacter(character).peek(association -> association.stolenBy(group.player()));
-                            }
->>>>>>> f879c654970ea2527c9daf7db946ac251b056c39
+                            ActionType uneAction = ActionType.draw2CardsAndKeep1;
+                            uneAction.execute(group, pioche, groups);
                             actionExecuted(group, actionChoisie, associations);
                             actionType11 = actionChoisie;
                             availableActions11 = availableActions11.remove(actionType11);

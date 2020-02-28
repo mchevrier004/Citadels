@@ -3,7 +3,6 @@ package com.montaury.citadels.character;
 import com.montaury.citadels.district.DistrictType;
 import com.montaury.citadels.round.ActionType;
 import io.vavr.collection.List;
-import io.vavr.control.Option;
 
 public enum Character {
     ASSASSIN(1, "Assassin", List.of(ActionType.killPlayer)),
@@ -25,7 +24,7 @@ public enum Character {
         this.number = number;
         this.name = name;
         this.powers = powers;
-        this.districtType = districtType;
+        this.associatedDistrictType = districtType;
     }
 
     public int number() {
@@ -38,12 +37,12 @@ public enum Character {
 
     public List<ActionType> getPowers() { return powers;}
 
-    public DistrictType getDistrictType() {
-        return districtType;
+    public DistrictType getAssociatedDistrictType() {
+        return associatedDistrictType;
     }
 
     private final int number;
     private final String name;
     private final List<ActionType> powers;
-    private final DistrictType districtType;
+    private final DistrictType associatedDistrictType;
 }

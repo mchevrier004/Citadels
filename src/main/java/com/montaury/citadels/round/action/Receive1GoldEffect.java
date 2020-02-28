@@ -9,4 +9,8 @@ public class Receive1GoldEffect extends Effect {
     public void execute(Group group, CardPile pioche, GameRoundAssociations groups) {
         group.player().add(1);
     }
+    @Override
+    public boolean isExecutable(Group group, CardPile pioche, GameRoundAssociations groups) {
+        return !group.player().buildableDistrictsInHand().isEmpty();
+    }
 }

@@ -11,4 +11,8 @@ public class BuildDistrictEffect extends Effect {
         Card card = group.player().controller.selectAmong(group.player().buildableDistrictsInHand());
         group.player().buildDistrict(card);
     }
+    @Override
+    public boolean isExecutable(Group group, CardPile pioche, GameRoundAssociations groups) {
+        return !group.player().buildableDistrictsInHand().isEmpty();
+    }
 }

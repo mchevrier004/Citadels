@@ -10,4 +10,8 @@ public class Pick2CardsEffect extends Effect {
     public void execute(Group group, CardPile pioche, GameRoundAssociations groups) {
         group.player().add(pioche.draw(2));
     }
+    @Override
+    public boolean isExecutable(Group group, CardPile pioche, GameRoundAssociations groups) {
+        return !group.player().buildableDistrictsInHand().isEmpty();
+    }
 }

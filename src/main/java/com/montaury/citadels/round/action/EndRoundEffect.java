@@ -10,4 +10,8 @@ public class EndRoundEffect extends Effect {
     public void execute(Group group, CardPile pioche, GameRoundAssociations groups) {
         System.out.println("Fin du round");
     }
+    @Override
+    public boolean isExecutable(Group group, CardPile pioche, GameRoundAssociations groups) {
+        return !group.player().buildableDistrictsInHand().isEmpty();
+    }
 }

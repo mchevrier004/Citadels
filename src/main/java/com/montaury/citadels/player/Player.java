@@ -1,10 +1,13 @@
 package com.montaury.citadels.player;
 
+import com.montaury.citadels.Board;
 import com.montaury.citadels.City;
 import com.montaury.citadels.Possession;
 import com.montaury.citadels.district.Card;
 import io.vavr.collection.HashSet;
 import io.vavr.collection.Set;
+import java.util.Scanner;
+
 
 public class Player {
     private final String name;
@@ -24,6 +27,18 @@ public class Player {
         this.city = city;
         this.gold = 0;
         this.controller = controller;
+    }
+
+    public Player(Scanner scanner, Board board){
+        System.out.println("Hello! Quel est votre nom ? ");
+        String playerName = scanner.next();
+        System.out.println("Quel est votre age ? ");
+        int playerAge = scanner.nextInt();
+        this.name = playerName;
+        this.age = playerAge;
+        this.city = new City(board);
+        this.gold = 0;
+        this.controller = new HumanController();
     }
 
     public String name() {
@@ -95,7 +110,7 @@ public class Player {
     }
 
     public void pay(int cost) {
-        gold -= ((cost));
+        gold -= (cost);
     }
 
 }

@@ -9,7 +9,7 @@ import com.montaury.citadels.round.Group;
 public class ReceiveIncomeEffect extends Effect {
     @Override
     public void execute(Group group, CardPile pioche, GameRoundAssociations groups) {
-        DistrictType type = group.character.getDistrictType();
+        DistrictType type = group.character.getAssociatedDistrictType();
         if (type != null) {
             for (District d : group.player().city().districts()) {
                 if (d.districtType() == type) {
@@ -20,5 +20,9 @@ public class ReceiveIncomeEffect extends Effect {
                 group.player().add(1);
             }
         }
+    }
+    @Override
+    public boolean isExecutable(Group group, CardPile pioche, GameRoundAssociations groups) {
+        return !group.player().buildableDistrictsInHand().isEmpty();
     }
 }

@@ -12,4 +12,8 @@ public class ExchangeCardsEffect extends Effect {
         Player playerToSwapWith = group.player().controller.selectPlayerAmong(groups.associations.map(Group::player).remove(group.player()));
         group.player().exchangeHandWith(playerToSwapWith);
     }
+    @Override
+    public boolean isExecutable(Group group, CardPile pioche, GameRoundAssociations groups) {
+        return !group.player().buildableDistrictsInHand().isEmpty();
+    }
 }

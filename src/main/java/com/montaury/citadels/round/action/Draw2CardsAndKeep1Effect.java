@@ -19,4 +19,8 @@ public class Draw2CardsAndKeep1Effect extends Effect {
         }
         group.player().add(cardsDrawn);
     }
+    @Override
+    public boolean isExecutable(Group group, CardPile pioche, GameRoundAssociations groups) {
+        return !group.player().buildableDistrictsInHand().isEmpty();
+    }
 }

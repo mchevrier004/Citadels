@@ -13,4 +13,8 @@ public class RobPlayerEffect extends Effect {
                 .removeAll(groups.associations.find(Group::isMurdered).map(Group::character)));
         groups.associationToCharacter(character).peek(association -> association.stolenBy(group.player()));
     }
+    @Override
+    public boolean isExecutable(Group group, CardPile pioche, GameRoundAssociations groups) {
+        return !group.player().buildableDistrictsInHand().isEmpty();
+    }
 }

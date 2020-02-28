@@ -10,4 +10,8 @@ public class Draw3For2CoinsEffect extends Effect {
         group.player().add(pioche.draw(3));
         group.player().pay(2);
     }
+    @Override
+    public boolean isExecutable(Group group, CardPile pioche, GameRoundAssociations groups) {
+        return !group.player().buildableDistrictsInHand().isEmpty();
+    }
 }

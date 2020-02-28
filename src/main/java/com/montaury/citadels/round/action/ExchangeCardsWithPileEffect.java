@@ -13,4 +13,8 @@ public class ExchangeCardsWithPileEffect extends Effect {
         group.player().cards = group.player().cards().removeAll(cardsToSwap);
         group.player().add(pioche.swapWith(cardsToSwap.toList()));
     }
+    @Override
+    public boolean isExecutable(Group group, CardPile pioche, GameRoundAssociations groups) {
+        return !group.player().buildableDistrictsInHand().isEmpty();
+    }
 }

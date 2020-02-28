@@ -28,17 +28,13 @@ public class Citadels {
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        //Procédure de création du joueur
-
-        printLine("Hello! Quel est votre nom ? ");
-        String playerName = scanner.next();
-        printLine("Quel est votre age ? ");
-        int playerAge = scanner.nextInt();
         Board board = new Board();
-        Player p = new Player(playerName, playerAge, new City(board), new HumanController());
+        //Procédure de création du joueur
+        Player p = new Player(scanner, board);
         p.human = true;
+
+        //Procédure de création des joueurs(ordinateur) et ajout dans la liste de joueurs
         List<Player> players = List.of(p);
-        //Procédure de création des joueurs(ordinateur)
         printLine("Saisir le nombre de joueurs total (entre 2 et 8): ");
         int nbP;
         do {

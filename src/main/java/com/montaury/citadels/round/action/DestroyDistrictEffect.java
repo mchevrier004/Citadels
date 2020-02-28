@@ -9,4 +9,8 @@ public class DestroyDistrictEffect extends Effect {
     public void execute(Group group, CardPile pioche, GameRoundAssociations groups) {
         //tu met des trucs là
     }
+    @Override
+    public boolean isExecutable(Group group, CardPile pioche, GameRoundAssociations groups) {
+        return !group.player().buildableDistrictsInHand().isEmpty();
+    }
 }

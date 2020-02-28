@@ -87,13 +87,7 @@ public class Citadels {
 
             //choix des personnages et définition du tour
             List<Group> associations1 = List.empty();
-            for (Player player : playersInOrder) {
-                printLine(player.name() + " doit choisir un personnage");
-                availableCharacters = availableCharacters.size() == 1 && playersInOrder.size() == 7 ? availableCharacters.append(faceDownDiscardedCharacter) : availableCharacters;
-                Character selectedCharacter = player.controller.selectOwnCharacter(availableCharacters, faceUpDiscardedCharacters);
-                availableCharacters = availableCharacters.remove(selectedCharacter);
-                associations1 = associations1.append(new Group(player, selectedCharacter));
-            }
+            chooseCharacter(playersInOrder, availableCharacters, faceDownDiscardedCharacter, faceUpDiscardedCharacters, associations1);
             List<Group> associations = associations1;
             GameRoundAssociations groups = new GameRoundAssociations(associations);
 
@@ -192,6 +186,16 @@ public class Citadels {
     private static String textHand(Player player) {
         Set<Card> cards = player.cards();
         return cards.isEmpty() ? "Empty" : cards.map(Citadels::textCard).mkString(", ");
+    }
+
+    private static void chooseCharacter(List<Player> playersInOrder, List<Character> availableCharacters, Character faceDownDiscardedCharacter, List<Character> faceUpDiscardedCharacters, List<Group> associations1){
+        for (Player player : playersInOrder) {
+            printLine(player.name() + " doit choisir un personnage");
+            availableCharacters = availableCharacters.size() == 1 && playersInOrder.size() == 7 ? availableCharacters.append(faceDownDiscardedCharacter) : availableCharacters;
+            Character selectedCharacter = player.controller.selectOwnCharacter(availableCharacters, faceUpDiscardedCharacters);
+            availableCharacters = availableCharacters.remove(selectedCharacter);
+            associations1 = associations1.append(new Group(player, selectedCharacter));
+        }
     }
 
     private static String textCard(Card card) {

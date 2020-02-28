@@ -12,6 +12,6 @@ public class Pick2CardsEffect extends Effect {
     }
     @Override
     public boolean isExecutable(Group group, CardPile pioche, GameRoundAssociations groups) {
-        return !group.player().buildableDistrictsInHand().isEmpty();
+        return pioche.canDraw(2);
     }
 }

@@ -11,6 +11,6 @@ public class DestroyDistrictEffect extends Effect {
     }
     @Override
     public boolean isExecutable(Group group, CardPile pioche, GameRoundAssociations groups) {
-        return !group.player().buildableDistrictsInHand().isEmpty();
+        return DestroyDistrictAction.districtsDestructibleBy(groups, group.player()).exists(districtsByPlayer -> !districtsByPlayer._2().isEmpty());
     }
 }

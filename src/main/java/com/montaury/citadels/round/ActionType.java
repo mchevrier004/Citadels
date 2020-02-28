@@ -30,4 +30,7 @@ public enum ActionType {
     public void execute(Group group, CardPile pioche, GameRoundAssociations groups){
         this.effect.execute(group, pioche, groups);
     }
+    public boolean isExecutable(Group group, CardPile pioche, GameRoundAssociations groups){
+        return this.effect.isExecutable(group, pioche, groups);
+    }
 }

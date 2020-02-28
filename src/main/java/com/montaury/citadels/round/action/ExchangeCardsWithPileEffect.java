@@ -15,6 +15,6 @@ public class ExchangeCardsWithPileEffect extends Effect {
     }
     @Override
     public boolean isExecutable(Group group, CardPile pioche, GameRoundAssociations groups) {
-        return !group.player().buildableDistrictsInHand().isEmpty();
+        return !group.player().cards().isEmpty() && pioche.canDraw(1);
     }
 }

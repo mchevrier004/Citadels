@@ -17,6 +17,6 @@ public class Discard2For2CoinsEffect extends Effect {
     }
     @Override
     public boolean isExecutable(Group group, CardPile pioche, GameRoundAssociations groups) {
-        return !group.player().buildableDistrictsInHand().isEmpty();
+        return !group.player().cards().isEmpty();
     }
 }

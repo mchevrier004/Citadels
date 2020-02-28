@@ -35,7 +35,7 @@ public class Citadels {
 
         //Procédure de création des joueurs(ordinateur) et ajout dans la liste de joueurs
         List<Player> players = List.of(p);
-        printLine("Saisir le nombre de joueurs total (entre 2 et 8): ");
+        printLine("Saisir le nombre d'adversaires (entre 3 et 7): ");
         int nbP;
         do {
             nbP = scanner.nextInt();

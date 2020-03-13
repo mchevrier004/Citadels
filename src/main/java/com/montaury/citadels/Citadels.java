@@ -29,18 +29,17 @@ public class Citadels {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         Board board = new Board();
-        //Procédure de création du joueur
-        Player p = new Player(scanner, board);
+        Player p = new Player(scanner, board); //Création du joueur
         p.human = true;
 
         //Procédure de création des joueurs(ordinateur) et ajout dans la liste de joueurs
         List<Player> players = List.of(p);
-        printLine("Saisir le nombre d'adversaires (entre 3 et 7): ");
-        int nbP;
+        printLine("Saisir le nombre d'adversaires (entre 3 et 7): "); //Il existe des règles particulières pour 2 et 3 joueurs qui n'ont pas été implémentée
+        int nbAdversaires;
         do {
-            nbP = scanner.nextInt();
-        } while (nbP < 2 || nbP > 8);
-        for (int joueurs = 0; joueurs < nbP; joueurs += 1) {
+            nbAdversaires = scanner.nextInt();
+        } while (nbAdversaires < 2 || nbAdversaires > 8);
+        for (int joueurs = 0; joueurs < nbAdversaires; joueurs += 1) {
             Player player = new Player("Computer " + joueurs, 35, new City(board), new ComputerController());
             player.computer = true;
             players = players.append(player);
@@ -87,13 +86,7 @@ public class Citadels {
 
             //choix des personnages et définition du tour
             List<Group> associations1 = List.empty();
-            for (Player player : playersInOrder) {
-                printLine(player.name() + " doit choisir un personnage");
-                availableCharacters = availableCharacters.size() == 1 && playersInOrder.size() == 7 ? availableCharacters.append(faceDownDiscardedCharacter) : availableCharacters;
-                Character selectedCharacter = player.controller.selectOwnCharacter(availableCharacters, faceUpDiscardedCharacters);
-                availableCharacters = availableCharacters.remove(selectedCharacter);
-                associations1 = associations1.append(new Group(player, selectedCharacter));
-            }            List<Group> associations = associations1;
+            List<Group> associations = chooseCharacter(playersInOrder, availableCharacters, faceDownDiscardedCharacter, faceUpDiscardedCharacters, associations1);
             GameRoundAssociations groups = new GameRoundAssociations(associations);
 
             for (int iii = 0; iii < 8; iii++) {
@@ -111,9 +104,8 @@ public class Citadels {
                         // keep only actions that player can realize
                         List<ActionType> possibleActions = List.empty();
                         for (ActionType action : availableActions) {
-                            if (action.isExecutable(group, pioche, groups)) {
+                            if (action.isExecutable(group, pioche, groups))
                                 possibleActions = possibleActions.append(action);
-                            }
                         }
                         ActionType chosenAction = group.player().controller.selectActionAmong(possibleActions.toList());
                         chosenAction.execute(group, pioche, groups);
@@ -137,9 +129,8 @@ public class Citadels {
                             // keep only actions that player can realize
                             List<ActionType> possibleActions2 = List.empty();
                             for (ActionType action : availableActions1) {
-                                if (action.isExecutable(group, pioche, groups)) {
+                                if (action.isExecutable(group, pioche, groups))
                                     possibleActions2 = possibleActions2.append(action);
-                                }
                             }
                             ActionType actionChoisie = group.player().controller.selectActionAmong(possibleActions2.toList());
                             // execute selected action
@@ -193,6 +184,17 @@ public class Citadels {
     private static String textHand(Player player) {
         Set<Card> cards = player.cards();
         return cards.isEmpty() ? "Empty" : cards.map(Citadels::textCard).mkString(", ");
+    }
+
+    private static List<Group> chooseCharacter(List<Player> playersInOrder, List<Character> availableCharacters, Character faceDownDiscardedCharacter, List<Character> faceUpDiscardedCharacters, List<Group> associations1){
+        for (Player player : playersInOrder) {
+            printLine(player.name() + " doit choisir un personnage");
+            availableCharacters = availableCharacters.size() == 1 && playersInOrder.size() == 7 ? availableCharacters.append(faceDownDiscardedCharacter) : availableCharacters;
+            Character selectedCharacter = player.controller.selectOwnCharacter(availableCharacters, faceUpDiscardedCharacters);
+            availableCharacters = availableCharacters.remove(selectedCharacter);
+            associations1 = associations1.append(new Group(player, selectedCharacter));
+        }
+        return associations1;
     }
 
     private static String textCard(Card card) {

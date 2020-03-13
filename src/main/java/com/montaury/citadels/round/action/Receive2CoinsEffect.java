@@ -12,6 +12,6 @@ public class Receive2CoinsEffect extends Effect {
     }
     @Override
     public boolean isExecutable(Group group, CardPile pioche, GameRoundAssociations groups) {
-        return !group.player().buildableDistrictsInHand().isEmpty();
+        return true;
     }
 }

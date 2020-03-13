@@ -10,7 +10,6 @@ import com.montaury.citadels.player.Player;
 import com.montaury.citadels.round.ActionType;
 import com.montaury.citadels.round.GameRoundAssociations;
 import com.montaury.citadels.round.Group;
-import com.montaury.citadels.round.action.DestroyDistrictAction;
 import io.vavr.Tuple;
 import io.vavr.collection.List;
 import io.vavr.collection.Set;
@@ -97,10 +96,7 @@ public class Citadels {
                         EnumSet<ActionType> baseActions = EnumSet.of(ActionType.draw2CardsAndKeep1, ActionType.receive2Coins);
                         List<District> districts = group.player().city().districts();
                         EnumSet<ActionType> availableActions = baseActions;
-                        if (districts.contains(District.OBSERVATORY)) {
-                            availableActions.remove(ActionType.draw2CardsAndKeep1);
-                            availableActions.add(ActionType.draw3Keep1);
-                        }
+                        observatoryAppendAction(districts, availableActions);
                         // keep only actions that player can realize
                         List<ActionType> possibleActions = List.empty();
                         for (ActionType action : availableActions) {
@@ -114,12 +110,7 @@ public class Citadels {
                         // receive powers from the character
                         List<ActionType> powers = group.character.getPowers();
                         List<ActionType> extraActions = List.empty();
-                        if (group.player().city().districts().contains(District.SMITHY)) {
-                            extraActions = extraActions.append(ActionType.draw3For2Coins);
-                        }
-                        if (group.player().city().districts().contains(District.LABORATORY)) {
-                            extraActions = extraActions.append(ActionType.discard2For2Coins);
-                        }
+                        districtAppendAction(extraActions, group);
                         Set<ActionType> availableActions11 = Group.OPTIONAL_ACTIONS
                                 .addAll(powers)
                                 .addAll(extraActions);
@@ -195,6 +186,23 @@ public class Citadels {
             associations1 = associations1.append(new Group(player, selectedCharacter));
         }
         return associations1;
+    }
+
+    private static void observatoryAppendAction(List<District> districts, EnumSet<ActionType> availableActions){
+        if (districts.contains(District.OBSERVATORY)) {
+            availableActions.remove(ActionType.draw2CardsAndKeep1);
+            availableActions.add(ActionType.draw3Keep1);
+        }
+    }
+
+
+    private static void districtAppendAction(List<ActionType> extraActions, Group group){
+        if (group.player().city().districts().contains(District.SMITHY)) {
+            extraActions = extraActions.append(ActionType.draw3For2Coins);
+        }
+        if (group.player().city().districts().contains(District.LABORATORY)) {
+            extraActions = extraActions.append(ActionType.discard2For2Coins);
+        }
     }
 
     private static String textCard(Card card) {

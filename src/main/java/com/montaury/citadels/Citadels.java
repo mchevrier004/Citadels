@@ -111,8 +111,9 @@ public class Citadels {
                         // keep only actions that player can realize
                         List<ActionType> possibleActions = List.empty();
                         for (ActionType action : availableActions) {
-                            if (action.isExecutable(group, pioche, groups))
+                            if (action.isExecutable(group, pioche, groups)) {
                                 possibleActions = possibleActions.append(action);
+                            }
                         }
                         ActionType chosenAction = group.player().controller.selectActionAmong(possibleActions.toList());
                         chosenAction.execute(group, pioche, groups);
@@ -136,8 +137,9 @@ public class Citadels {
                             // keep only actions that player can realize
                             List<ActionType> possibleActions2 = List.empty();
                             for (ActionType action : availableActions1) {
-                                if (action.isExecutable(group, pioche, groups))
+                                if (action.isExecutable(group, pioche, groups)) {
                                     possibleActions2 = possibleActions2.append(action);
+                                }
                             }
                             ActionType actionChoisie = group.player().controller.selectActionAmong(possibleActions2.toList());
                             // execute selected action

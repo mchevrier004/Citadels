@@ -34,7 +34,8 @@ public class Citadels {
         //Procédure de création des joueurs(ordinateur) et ajout dans la liste de joueurs
         List<Player> players = List.of(p);
         printLine("Saisir le nombre d'adversaires (entre 3 et 7): "); //Il existe des règles particulières pour 2 et 3 joueurs qui n'ont pas été implémentée
-        int nbOpponents = getNbOpponents(nbOpponents, scanner);
+        int nbOpponents = 0;
+        nbOpponents = getNbOpponents(scanner);
         for (int joueurs = 0; joueurs < nbOpponents; joueurs += 1) {
             Player player = new Player("Ordinateur " + joueurs, 35, new City(board), new ComputerController());
             player.computer = true;
@@ -44,10 +45,7 @@ public class Citadels {
 
         //création de la pioche et distribution
         CardPile pioche = new CardPile(Card.all().toList().shuffle());
-        players.forEach(player -> {
-            player.add(2);
-            player.add(pioche.draw(2));
-        });
+        setUpPlayers(pioche, players);
         //remise de la couronne et définition du tour du jeu
         Player crown = players.maxBy(Player::age).get();
 
@@ -116,10 +114,7 @@ public class Citadels {
                             Set<ActionType> availableActions1 = availableActions11;
                             // keep only actions that player can realize
                             List<ActionType> possibleActions2 = List.empty();
-                            for (ActionType action : availableActions1) {
-                                if (action.isExecutable(group, pioche, groups))
-                                    possibleActions2 = possibleActions2.append(action);
-                            }
+                            possibleActions2 = appendActionExecutable(pioche, group, possibleActions2, availableActions1, groups);
                             ActionType actionChoisie = group.player().controller.selectActionAmong(possibleActions2.toList());
                             // execute selected action
                             actionChoisie.execute(group, pioche, groups);
@@ -201,11 +196,27 @@ public class Citadels {
             extraActions = extraActions.append(ActionType.discard2For2Coins);
         }
     }
-    private static int getNbOpponents(int nbOpponents, Scanner scanner){
+    private static int getNbOpponents(Scanner scanner){
+        int nbOpponents;
         do {
             nbOpponents = scanner.nextInt();
         } while (nbOpponents < 2 || nbOpponents > 8);
         return nbOpponents;
+    }
+
+    private static void setUpPlayers(CardPile pioche, List<Player> players){
+        players.forEach(player -> {
+            player.add(2);
+            player.add(pioche.draw(2));
+        });
+    }
+
+    private static List<ActionType> appendActionExecutable(CardPile pioche, Group group, List<ActionType> possibleActions2, Set<ActionType> availableActions1, GameRoundAssociations groups){
+        for (ActionType action : availableActions1) {
+            if (action.isExecutable(group, pioche, groups))
+                possibleActions2 = possibleActions2.append(action);
+        }
+        return possibleActions2;
     }
 
     private static String textCard(Card card) {

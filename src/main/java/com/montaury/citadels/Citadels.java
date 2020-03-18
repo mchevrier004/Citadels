@@ -34,12 +34,9 @@ public class Citadels {
         //Procédure de création des joueurs(ordinateur) et ajout dans la liste de joueurs
         List<Player> players = List.of(p);
         printLine("Saisir le nombre d'adversaires (entre 3 et 7): "); //Il existe des règles particulières pour 2 et 3 joueurs qui n'ont pas été implémentée
-        int nbAdversaires;
-        do {
-            nbAdversaires = scanner.nextInt();
-        } while (nbAdversaires < 2 || nbAdversaires > 8);
-        for (int joueurs = 0; joueurs < nbAdversaires; joueurs += 1) {
-            Player player = new Player("Computer " + joueurs, 35, new City(board), new ComputerController());
+        int nbOpponents = getNbOpponents(nbOpponents, scanner);
+        for (int joueurs = 0; joueurs < nbOpponents; joueurs += 1) {
+            Player player = new Player("Ordinateur " + joueurs, 35, new City(board), new ComputerController());
             player.computer = true;
             players = players.append(player);
         }
@@ -203,6 +200,12 @@ public class Citadels {
         if (group.player().city().districts().contains(District.LABORATORY)) {
             extraActions = extraActions.append(ActionType.discard2For2Coins);
         }
+    }
+    private static int getNbOpponents(int nbOpponents, Scanner scanner){
+        do {
+            nbOpponents = scanner.nextInt();
+        } while (nbOpponents < 2 || nbOpponents > 8);
+        return nbOpponents;
     }
 
     private static String textCard(Card card) {

@@ -1,6 +1,7 @@
 package com.montaury.citadels;
 
 import com.montaury.citadels.character.Character;
+import com.montaury.citadels.character.CharacterChoose;
 import com.montaury.citadels.character.RandomCharacterSelector;
 import com.montaury.citadels.district.Card;
 import com.montaury.citadels.district.District;
@@ -33,6 +34,8 @@ public class Citadels {
         Player p = new Player(scanner, board);
         p.human = true;
 
+
+
         //Procédure de création des joueurs(ordinateur) et ajout dans la liste de joueurs
         List<Player> players = List.of(p);
         printLine("Saisir le nombre d'adversaires (entre 3 et 7): ");
@@ -45,7 +48,11 @@ public class Citadels {
             player.computer = true;
             players = players.append(player);
         }
-        //Initialisation du jeu
+
+        //Sélection des personnages présent dans le jeu
+        printLine("Sélection des personnages");
+        CharacterChoose characterSelection = new CharacterChoose();
+        characterSelection.buildCharacterDeck();
 
         //création de la pioche et distribution
         CardPile pioche = new CardPile(Card.all().toList().shuffle());
@@ -53,6 +60,7 @@ public class Citadels {
             player.add(2);
             player.add(pioche.draw(2));
         });
+
         //remise de la couronne et définition du tour du jeu
         Player crown = players.maxBy(Player::age).get();
 
@@ -63,7 +71,8 @@ public class Citadels {
             Collections.rotate(list, -players.indexOf(crown));
             List<Player> playersInOrder = List.ofAll(list);
             RandomCharacterSelector randomCharacterSelector = new RandomCharacterSelector();
-            List<Character> availableCharacters = List.of(Character.ASSASSIN, Character.THIEF, Character.MAGICIAN, Character.KING, Character.BISHOP, Character.MERCHANT, Character.ARCHITECT, Character.WARLORD);
+
+            List<Character> availableCharacters = characterSelection.getCharacterDeck();
 
             List<Character> availableCharacters1 = availableCharacters;
             List<Character> discardedCharacters = List.empty();
@@ -115,6 +124,7 @@ public class Citadels {
                                 possibleActions = possibleActions.append(action);
                             }
                         }
+
                         ActionType chosenAction = group.player().controller.selectActionAmong(possibleActions.toList());
                         chosenAction.execute(group, pioche, groups);
                         actionExecuted(group, chosenAction, associations);

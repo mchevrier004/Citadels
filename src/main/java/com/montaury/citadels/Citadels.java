@@ -1,6 +1,7 @@
 package com.montaury.citadels;
 
 import com.montaury.citadels.character.Character;
+import com.montaury.citadels.character.CharacterChoose;
 import com.montaury.citadels.character.RandomCharacterSelector;
 import com.montaury.citadels.district.Card;
 import com.montaury.citadels.district.District;
@@ -10,6 +11,7 @@ import com.montaury.citadels.player.Player;
 import com.montaury.citadels.round.ActionType;
 import com.montaury.citadels.round.GameRoundAssociations;
 import com.montaury.citadels.round.Group;
+import com.montaury.citadels.round.action.DestroyDistrictAction;
 import io.vavr.Tuple;
 import io.vavr.collection.List;
 import io.vavr.collection.Set;
@@ -28,24 +30,37 @@ public class Citadels {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         Board board = new Board();
-        Player p = new Player(scanner, board); //Création du joueur
+        //Procédure de création du joueur
+        Player p = new Player(scanner, board);
         p.human = true;
+
+
 
         //Procédure de création des joueurs(ordinateur) et ajout dans la liste de joueurs
         List<Player> players = List.of(p);
-        printLine("Saisir le nombre d'adversaires (entre 3 et 7): "); //Il existe des règles particulières pour 2 et 3 joueurs qui n'ont pas été implémentée
-        int nbOpponents = 0;
-        nbOpponents = getNbOpponents(scanner);
-        for (int joueurs = 0; joueurs < nbOpponents; joueurs += 1) {
-            Player player = new Player("Ordinateur " + joueurs, 35, new City(board), new ComputerController());
+        printLine("Saisir le nombre d'adversaires (entre 3 et 7): ");
+        int nbP;
+        do {
+            nbP = scanner.nextInt();
+        } while (nbP < 2 || nbP > 8);
+        for (int joueurs = 0; joueurs < nbP; joueurs += 1) {
+            Player player = new Player("Computer " + joueurs, 35, new City(board), new ComputerController());
             player.computer = true;
             players = players.append(player);
         }
-        //Initialisation du jeu
+
+        //Sélection des personnages présent dans le jeu
+        printLine("Sélection des personnages");
+        CharacterChoose characterSelection = new CharacterChoose();
+        characterSelection.buildCharacterDeck();
 
         //création de la pioche et distribution
         CardPile pioche = new CardPile(Card.all().toList().shuffle());
-        setUpPlayers(pioche, players);
+        players.forEach(player -> {
+            player.add(2);
+            player.add(pioche.draw(2));
+        });
+
         //remise de la couronne et définition du tour du jeu
         Player crown = players.maxBy(Player::age).get();
 
@@ -56,7 +71,8 @@ public class Citadels {
             Collections.rotate(list, -players.indexOf(crown));
             List<Player> playersInOrder = List.ofAll(list);
             RandomCharacterSelector randomCharacterSelector = new RandomCharacterSelector();
-            List<Character> availableCharacters = List.of(Character.ASSASSIN, Character.THIEF, Character.MAGICIAN, Character.KING, Character.BISHOP, Character.MERCHANT, Character.ARCHITECT, Character.WARLORD);
+
+            List<Character> availableCharacters = characterSelection.getCharacterDeck();
 
             List<Character> availableCharacters1 = availableCharacters;
             List<Character> discardedCharacters = List.empty();
@@ -80,7 +96,13 @@ public class Citadels {
 
             //choix des personnages et définition du tour
             List<Group> associations1 = List.empty();
-            List<Group> associations = chooseCharacter(playersInOrder, availableCharacters, faceDownDiscardedCharacter, faceUpDiscardedCharacters, associations1);
+            for (Player player : playersInOrder) {
+                printLine(player.name() + " doit choisir un personnage");
+                availableCharacters = availableCharacters.size() == 1 && playersInOrder.size() == 7 ? availableCharacters.append(faceDownDiscardedCharacter) : availableCharacters;
+                Character selectedCharacter = player.controller.selectOwnCharacter(availableCharacters, faceUpDiscardedCharacters);
+                availableCharacters = availableCharacters.remove(selectedCharacter);
+                associations1 = associations1.append(new Group(player, selectedCharacter));
+            }            List<Group> associations = associations1;
             GameRoundAssociations groups = new GameRoundAssociations(associations);
 
             for (int iii = 0; iii < 8; iii++) {
@@ -91,13 +113,18 @@ public class Citadels {
                         EnumSet<ActionType> baseActions = EnumSet.of(ActionType.draw2CardsAndKeep1, ActionType.receive2Coins);
                         List<District> districts = group.player().city().districts();
                         EnumSet<ActionType> availableActions = baseActions;
-                        observatoryAppendAction(districts, availableActions);
+                        if (districts.contains(District.OBSERVATORY)) {
+                            availableActions.remove(ActionType.draw2CardsAndKeep1);
+                            availableActions.add(ActionType.draw3Keep1);
+                        }
                         // keep only actions that player can realize
                         List<ActionType> possibleActions = List.empty();
                         for (ActionType action : availableActions) {
-                            if (action.isExecutable(group, pioche, groups))
+                            if (action.isExecutable(group, pioche, groups)) {
                                 possibleActions = possibleActions.append(action);
+                            }
                         }
+
                         ActionType chosenAction = group.player().controller.selectActionAmong(possibleActions.toList());
                         chosenAction.execute(group, pioche, groups);
                         actionExecuted(group, chosenAction, associations);
@@ -105,7 +132,12 @@ public class Citadels {
                         // receive powers from the character
                         List<ActionType> powers = group.character.getPowers();
                         List<ActionType> extraActions = List.empty();
-                        districtAppendAction(extraActions, group);
+                        if (group.player().city().districts().contains(District.SMITHY)) {
+                            extraActions = extraActions.append(ActionType.draw3For2Coins);
+                        }
+                        if (group.player().city().districts().contains(District.LABORATORY)) {
+                            extraActions = extraActions.append(ActionType.discard2For2Coins);
+                        }
                         Set<ActionType> availableActions11 = Group.OPTIONAL_ACTIONS
                         .addAll(powers)
                         .addAll(extraActions);
@@ -114,7 +146,11 @@ public class Citadels {
                             Set<ActionType> availableActions1 = availableActions11;
                             // keep only actions that player can realize
                             List<ActionType> possibleActions2 = List.empty();
-                            possibleActions2 = appendActionExecutable(pioche, group, possibleActions2, availableActions1, groups);
+                            for (ActionType action : availableActions1) {
+                                if (action.isExecutable(group, pioche, groups)) {
+                                    possibleActions2 = possibleActions2.append(action);
+                                }
+                            }
                             ActionType actionChoisie = group.player().controller.selectActionAmong(possibleActions2.toList());
                             // execute selected action
                             actionChoisie.execute(group, pioche, groups);
@@ -167,56 +203,6 @@ public class Citadels {
     private static String textHand(Player player) {
         Set<Card> cards = player.cards();
         return cards.isEmpty() ? "Empty" : cards.map(Citadels::textCard).mkString(", ");
-    }
-
-    private static List<Group> chooseCharacter(List<Player> playersInOrder, List<Character> availableCharacters, Character faceDownDiscardedCharacter, List<Character> faceUpDiscardedCharacters, List<Group> associations1){
-        for (Player player : playersInOrder) {
-            printLine(player.name() + " doit choisir un personnage");
-            availableCharacters = availableCharacters.size() == 1 && playersInOrder.size() == 7 ? availableCharacters.append(faceDownDiscardedCharacter) : availableCharacters;
-            Character selectedCharacter = player.controller.selectOwnCharacter(availableCharacters, faceUpDiscardedCharacters);
-            availableCharacters = availableCharacters.remove(selectedCharacter);
-            associations1 = associations1.append(new Group(player, selectedCharacter));
-        }
-        return associations1;
-    }
-
-    private static void observatoryAppendAction(List<District> districts, EnumSet<ActionType> availableActions){
-        if (districts.contains(District.OBSERVATORY)) {
-            availableActions.remove(ActionType.draw2CardsAndKeep1);
-            availableActions.add(ActionType.draw3Keep1);
-        }
-    }
-
-
-    private static void districtAppendAction(List<ActionType> extraActions, Group group){
-        if (group.player().city().districts().contains(District.SMITHY)) {
-            extraActions = extraActions.append(ActionType.draw3For2Coins);
-        }
-        if (group.player().city().districts().contains(District.LABORATORY)) {
-            extraActions = extraActions.append(ActionType.discard2For2Coins);
-        }
-    }
-    private static int getNbOpponents(Scanner scanner){
-        int nbOpponents;
-        do {
-            nbOpponents = scanner.nextInt();
-        } while (nbOpponents < 2 || nbOpponents > 8);
-        return nbOpponents;
-    }
-
-    private static void setUpPlayers(CardPile pioche, List<Player> players){
-        players.forEach(player -> {
-            player.add(2);
-            player.add(pioche.draw(2));
-        });
-    }
-
-    private static List<ActionType> appendActionExecutable(CardPile pioche, Group group, List<ActionType> possibleActions2, Set<ActionType> availableActions1, GameRoundAssociations groups){
-        for (ActionType action : availableActions1) {
-            if (action.isExecutable(group, pioche, groups))
-                possibleActions2 = possibleActions2.append(action);
-        }
-        return possibleActions2;
     }
 
     private static String textCard(Card card) {

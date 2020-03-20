@@ -1,0 +1,5 @@
+<<<<<<< HEAD
+ven. 20 mars 2020 12:55:03
+=======
+ven. 20 mars 2020 12:38:43
+>>>>>>> parent of ae4b373... Ajout d'une sélection interactive des personnages du jeu en début de partie. Définition de la classe CharacterChoose et ajout d'un attributs et de plusieurs méthodes. La saisie des personnages est vérifiée.

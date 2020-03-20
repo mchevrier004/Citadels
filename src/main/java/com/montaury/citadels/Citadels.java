@@ -107,8 +107,8 @@ public class Citadels {
                         List<ActionType> extraActions = List.empty();
                         districtAppendAction(extraActions, group);
                         Set<ActionType> availableActions11 = Group.OPTIONAL_ACTIONS
-                                .addAll(powers)
-                                .addAll(extraActions);
+                        .addAll(powers)
+                        .addAll(extraActions);
                         ActionType actionType11;
                         do {
                             Set<ActionType> availableActions1 = availableActions11;
@@ -134,21 +134,21 @@ public class Citadels {
         // si ex-aequo, le premier est celui qui n'est pas assassiné
         // si pas d'assassiné, le gagnant est le joueur ayant eu le personnage avec le numéro d'ordre le plus petit au dernier tour
         printLine("Classement: " + roundAssociations.sortBy(a -> Tuple.of(a.player().score(), !a.isMurdered(), a.character))
-                .reverse()
-                .map(Group::player));
+            .reverse()
+            .map(Group::player));
     }
 
     public static void actionExecuted(Group association, ActionType actionType, List<Group> associations) {
         printLine("Player " + association.player().name() + " executed action " + actionType);
         associations.map(Group::player)
-                .forEach(Citadels::displayStatus);
+        .forEach(Citadels::displayStatus);
     }
 
     private static void displayStatus(Player player) {
         printLine("  Player " + player.name() + ":\n" +
-                "    Gold coins: " + player.gold() + "\n" +
-                "    City: " + textCity(player) + "\n" +
-                "    Hand size: " + player.cards().size());
+            "    Gold coins: " + player.gold() + "\n" +
+            "    City: " + textCity(player) + "\n" +
+            "    Hand size: " + player.cards().size());
         if (player.controller instanceof HumanController) {
             printLine("    Hand: " + textHand(player));
         }
